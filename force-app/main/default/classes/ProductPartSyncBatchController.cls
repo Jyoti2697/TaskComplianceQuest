@@ -33,7 +33,7 @@ public class ProductPartSyncBatchController implements Database.Batchable<SObjec
         Map<Id,Product2> insertProduct= new Map<Id,Product2>();
         Map<String,Product2> existingProductMap= new Map<String,Product2>();
         //putting value in map with the same Product Name and code with Parts name and NUmber.
-        for(Product2 productObj: [Select Id,Name,ProductCode From Product2 Where Name IN: partsName AND ProductCode IN: partsNumber]){
+        for(Product2 productObj: [Select Id,Name,ProductCode From Product2 Where Name IN: partsName AND ProductCode IN: partsNumber LIMIT 10000]){
             existingProductMap.put(productObj.Name + productObj.ProductCode, productObj);
         }
         for(SQX_Part__c partOBj: partList){
@@ -49,14 +49,14 @@ public class ProductPartSyncBatchController implements Database.Batchable<SObjec
                 insertProduct.put(partOBj.Id,productObj);
             }
         }
-        if(!insertProduct.isEmpty()){
+        if(!insertProduct.isEmpty() && (Schema.sObjectType.Product2.isCreateable())){
             insert insertProduct.values();
             //Here getting the Product Id to set the associate products to parts
             for(Id eachPartId: insertProduct.keySet()){
                 updateParts.add(new SQX_Part__c(Id= eachPartId,Product__c = insertProduct.get(eachPartId).Id));
             }
         }
-        if(!updateParts.isEmpty()){
+        if(!updateParts.isEmpty() && (Schema.sObjectType.SQX_Part__c.isUpdateable())){
             update updateParts;
         }
         }
