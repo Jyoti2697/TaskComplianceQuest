@@ -49,7 +49,7 @@ public class ProductPartSyncBatchController implements Database.Batchable<SObjec
                 insertProduct.put(partOBj.Id,productObj);
             }
         }
-        // chechecking the update and create permission
+        // chechecking the update and create permission 
         if(!insertProduct.isEmpty() && (Schema.sObjectType.Product2.isCreateable())){
             insert insertProduct.values();
             //Here getting the Product Id to set the associate products to parts
